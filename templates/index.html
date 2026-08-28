@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>News Classification System</title>
+<!-- استبدل رابط FontAwesome في <head> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="static/style.css">
+
+<!-- Font Awesome CDN -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="static/style.css">
+
+</head>
+<body>
+
+<header>
+  <div class="header-content">
+    <h1><i class="fas fa-newspaper"></i> News Classification System</h1>
+  </div>
+</header>
+
+<br>
+
+<div class="container">
+  <div class="main-grid">
+    <!-- قسم الإدخال -->
+    <section class="card input-section">
+      <form id="predictionForm" novalidate>
+        <label for="newsText" style="font-weight: bold;">Enter News Text</label>
+        <textarea id="newsText" maxlength="2000" placeholder="Paste or type your news article here..."></textarea>
+        <div class="char-counter" id="charCounter">0 / 2000 characters</div>
+        <div class="error-message" id="errorMessage"></div>
+        <div class="button-group">
+          <button type="submit" id="predictBtn"> Classify Text</button>
+          <button type="button" class="btn-clear" id="clearBtn"> Clear</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- قسم النتائج -->
+    <section class="card results-section">
+      <div class="loading" id="loading">
+        <div class="spinner-container">
+          <div class="spinner"></div>
+        </div>
+        <!-- <p>Analyzing text with AI...</p> -->
+      </div>
+      <div class="result-content" id="resultContent">
+        <div class="result-icon-container">
+          <div class="result-icon" id="resultIcon">
+            <i class="fas fa-search"></i>
+          </div>
+        </div>
+        <br>
+        <h2 class="result-label" id="resultLabel" aria-live="polite" aria-atomic="true">
+          Ready to Classify
+        </h2>
+        
+        <p class="result-description" id="resultDescription">
+          Enter news text and click "Classify Text" to see the AI prediction result. 
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <!-- قسم الأمثلة (بالأسفل) -->
+  <section class="card examples-section">
+    <h2 class="examples-header">
+      Example Texts
+    </h2>
+    <div class="examples-grid" id="examplesGrid">
+      <!-- سيتم إضافة الأمثلة بواسطة JavaScript -->
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="footer-content">
+    <div class="model-info">
+      <i class="fas fa-robot"></i>
+      <span>Powered by Transformers AI | Model: DistilBERT</span>
+    </div>
+    <div>© 2026 News Classification System</div>
+  </div>
+</footer>
+
+<script>
+  // Elements
+  const newsText = document.getElementById('newsText');
+  const charCounter = document.getElementById('charCounter');
+  const predictionForm = document.getElementById('predictionForm');
+  const predictBtn = document.getElementById('predictBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const loading = document.getElementById('loading');
+  const resultContent = document.getElementById('resultContent');
+  const resultLabel = document.getElementById('resultLabel');
+  const resultIcon = document.getElementById('resultIcon');
+  const resultDescription = document.getElementById('resultDescription');
+  const errorMessage = document.getElementById('errorMessage');
+  const examplesGrid = document.getElementById('examplesGrid');
+
+  // Example texts - 6 examples for 2 rows
+  const examples = [
+    { text: "New movie starring famous actor breaks box office records in its opening weekend.", category: "ENTERTAINMENT" },
+    { text: "Popular streaming service announces new original series with A-list cast members.", category: "ENTERTAINMENT" },
+    { text: "The government announced new economic reforms.", category: "POLITICS" },
+    { text: "The president held a press conference to discuss the new economic reforms.", category: "POLITICS" },
+    { text: "The company launched a new smartphone model this year.", category: "OTHER" },
+    { text: "Technology companies are investing in artificial intelligence.", category: "OTHER" },
+  ];
+
+  // Category configurations
+  const categoryConfig = {
+    POLITICS: {
+      icon: '<i class="fas fa-landmark"></i>',
+    //   color: "category-politics",
+      description: "This article discusses political matters, government policies, elections, or international relations.",
+      details: "Political articles typically cover government decisions, elections, policies, international relations, and political events."
+    },
+    ENTERTAINMENT: {
+      icon: '<i class="fas fa-film"></i>',
+    //   color: "category-entertainment",
+      description: "This article covers entertainment topics like movies, music, celebrities, or streaming services.",
+      details: "Entertainment articles focus on movies, music, television, celebrities, streaming services, and cultural events."
+    },
+    OTHER: {
+      icon: '<i class="fas fa-newspaper"></i>',
+    //   color: "category-other",
+      description: "This article falls under other news categories like health, science, technology, or lifestyle.",
+      details: "This category includes articles about health, science, technology, education, lifestyle, and general news."
+    }
+  };
+
+  // Initialize
+  function init() {
+    updateCharCounter();
+    loadExamples();
+
+    newsText.addEventListener('input', updateCharCounter);
+    predictionForm.addEventListener('submit', handlePrediction);
+    clearBtn.addEventListener('click', clearForm);
+    
+    // Set focus to textarea
+    newsText.focus();
+  }
+
+  // Update character count
+  function updateCharCounter() {
+    const length = newsText.value.length;
+    charCounter.textContent = `${length} / 2000 characters`;
+    if (length > 1800) {
+      charCounter.classList.add('warning');
+    } else {
+      charCounter.classList.remove('warning');
+    }
+    hideError();
+  }
+
+  // Load example texts
+  function loadExamples() {
+    examplesGrid.innerHTML = '';
+    examples.forEach(({text, category}) => {
+      const config = categoryConfig[category];
+      const card = document.createElement('div');
+      card.className = 'example-card';
+      card.tabIndex = 0;
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', `Load example text in category ${category}`);
+      card.innerHTML = `
+        <div class="example-category ${config.color}">
+          <i class="fas fa-tag"></i>
+          ${category}
+        </div>
+        <p class="example-text">${text}</p>
+        <div style="margin-top: 15px; display: flex; align-items: center; color: #94a3b8; font-size: 0.85rem;">
+          <i style="margin-right: 8px;"></i>
+          Click to load
+        </div>
+      `;
+      card.addEventListener('click', () => {
+        newsText.value = text;
+        updateCharCounter();
+        newsText.focus();
+        // Scroll to textarea
+        newsText.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+      card.addEventListener('keypress', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          card.click();
+        }
+      });
+      examplesGrid.appendChild(card);
+    });
+  }
+
+  // Simulate prediction (replace with your real API call)
+  function simulatePrediction(text) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const lowerText = text.toLowerCase();
+        let prediction = 'OTHER';
+        if (/(government|president|election|minister|summit|climate|congress|senate|parliament)/.test(lowerText)) {
+          prediction = 'POLITICS';
+        } else if (/(movie|film|actor|music|streaming|series|celebrity|hollywood|oscar|album)/.test(lowerText)) {
+          prediction = 'ENTERTAINMENT';
+        }
+        resolve(prediction);
+      }, 1500);
+    });
+  }
+
+  // Handle form submit
+  async function handlePrediction(e) {
+    e.preventDefault();
+    const text = newsText.value.trim();
+    if (!text) {
+      showError('Please enter some text to classify.');
+      newsText.focus();
+      return;
+    }
+    if (text.length > 2000) {
+      showError('Text exceeds the 2000 character limit.');
+      return;
+    }
+
+    showLoading(true);
+    clearResult();
+
+    try {
+      const prediction = await simulatePrediction(text);
+      showResult(prediction);
+    } catch {
+      showError('An error occurred while predicting. Please try again.');
+    } finally {
+      showLoading(false);
+    }
+  }
+
+  // Show/hide loading spinner
+  function showLoading(show) {
+    loading.style.display = show ? 'flex' : 'none';
+    resultContent.style.display = show ? 'none' : 'flex';
+    predictBtn.disabled = show;
+  }
+
+  // Show error message
+  function showError(msg) {
+    errorMessage.textContent = msg;
+    errorMessage.style.display = 'block';
+    setTimeout(() => {
+      errorMessage.style.display = 'none';
+    }, 5000);
+  }
+  
+  function hideError() {
+    errorMessage.style.display = 'none';
+  }
+
+  // Show prediction result
+  function showResult(category) {
+    const config = categoryConfig[category];
+    
+    // Update icon - استخدم الأيقونات المخصصة
+    resultIcon.innerHTML = config.icon;
+    
+    // Set icon background based on category
+    if (category === 'POLITICS') {
+      resultIcon.style.background = 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)';
+      resultIcon.style.color = '#92400e';
+    } else if (category === 'ENTERTAINMENT') {
+      resultIcon.style.background = 'linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%)';
+      resultIcon.style.color = '#9d174d';
+    } else {
+      resultIcon.style.background = 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)';
+      resultIcon.style.color = '#3730a3';
+    }
+      
+    // Update label
+    resultLabel.textContent = category;
+    resultLabel.className = `result-label ${config.color}`;
+    
+    // Update description
+    resultDescription.textContent = config.description;
+  }
+
+  // Clear form and results
+  function clearForm() {
+    newsText.value = '';
+    updateCharCounter();
+    clearResult();
+    hideError();
+    newsText.focus();
+  }
+  
+  function clearResult() {
+    // Reset to default state
+    resultLabel.textContent = 'Ready to Classify';
+    resultLabel.className = 'result-label';
+    resultLabel.style.color = '#1e293b';
+    
+    // استخدم أيقونة FontAwesome بدلاً من الرمز التعبيري
+    resultIcon.innerHTML = '<i class="fas fa-search"></i>';
+    resultIcon.style.background = 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)';
+    resultIcon.style.color = '#0ea5e9';
+    
+    resultDescription.textContent = 'Enter news text and click "Classify Text" to see the AI prediction result. ';
+  }
+
+  // Initialize on DOM ready
+  document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>

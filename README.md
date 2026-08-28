@@ -133,7 +133,7 @@ These cells are **commented out** in the notebook. Uncomment them, run **once**,
 | MLP | LDA Topics | 68.49% |
 | **DistilBERT** | **Transformer** | **86.34%** |
 
-**Best Model / أفضل نموذج:** DistilBERT (86.34% Accuracy, Precision, Recall, F1 ≈ 0.86)
+**Best Model :** DistilBERT (86.34% Accuracy, Precision, Recall, F1 ≈ 0.86)
 
 ---
 
@@ -145,17 +145,17 @@ These cells are **commented out** in the notebook. Uncomment them, run **once**,
 2. **SVM Training Limitation SVM:**  
    SVM with RBF kernel has quadratic complexity. Training on the full dataset (>200K samples) is computationally impractical. Therefore, a **10% subset** is used for training while the full test set is used for evaluation.  
 
-3. **DistilBERT / المحول:**  
+3. **DistilBERT :**  
    - Training takes ~16 hours on CPU. Use GPU for faster training.  
    - The model is saved to `C:/Models/my_model/` by default. Change the path in the code if needed.  
 
 
-4. **LDA Topic Modeling / نماذج LDA:**  
+4. **LDA Topic Modeling  LDA:**  
    - Number of topics searched: [15, 20, 30, 35, 40, 45, 50, 60, 70]  
    - Best coherence achieved at **70 topics**  
    - Topics identified: Covid-19, Russia-Ukraine war, US Elections, Donald Trump, Hollywood, Gun shootings, Climate change, etc.
 
-5. **Preprocessing / المعالجة المسبقة:**  
+5. **Preprocessing  :**  
    - Lemmatization, stopword removal, POS filtering (NOUN, VERB, ADJ, PROPN)  
    - Bigram detection: `donald_trump`, `white_house`, `climate_change`  
    - Custom stopwords for news domain (huffpost, reporter, click, etc.)

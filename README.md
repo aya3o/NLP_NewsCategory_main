@@ -2,35 +2,33 @@
 Benchmarking_Traditional_and_Transformer_Based_Models_for_News_Topics 
 
 # NLP News Category Classification & Topic Modeling
-# تصنيف فئات الأخبار واستخراج المواضيع
 
-**Date / التاريخ:** 20/01/2026  
-**Course / المقرر:** Natural Language Processing - Final Project
+
+**Date :** 20/01/2026  
+**Course :** Natural Language Processing - Final Project
 
 ---
 
-## 📌 Overview / نظرة عامة
+## 📌 Overview
 
 This project performs **News Classification** and **Topic Modeling** on the HuffPost News Category Dataset (210K articles). It compares traditional ML models (SVM, Random Forest, MLP) with deep learning (DistilBERT) across multiple text representations (TFIDF, Word2Vec, LDA Topics).
 
-يقوم هذا المشروع بـ **تصنيف الأخبار** و **استخراج المواضيع** من مجموعة بيانات HuffPost (210 ألف خبر). يقارن بين نماذج التعلم الآلي التقليدية (SVM, Random Forest, MLP) والتعلم العميق (DistilBERT) عبر عدة تمثيلات نصية (TFIDF, Word2Vec, مواضيع LDA).
-
 ---
 
-## 🗂️ Project Structure / هيكل المشروع
+## 🗂️ Project Structure
 
 ```
 NLP_NewsCategory-main/
 ├── Dataset/
-│   ├── News_Category_Dataset_v3.json       ← Original dataset (فك الضغط هنا)
-│   └── Final_NewsCorpus_Clean.json         ← Generated after preprocessing (يُنشأ تلقائياً)
+│   ├── News_Category_Dataset_v3.json       ← Original dataset (extract here)
+│   └── Final_NewsCorpus_Clean.json         ← Generated after preprocessing
 ├── distilbert-base-uncased-finetuned/      ← DistilBERT checkpoints (ignored by Git)
 ├── W2V/
-│   └── fasttext_100.kv                     ← Word2Vec vectors (يُنشأ تلقائياً)
-├── lda_final_model/                        ← Final LDA model (يُنشأ تلقائياً)
-├── lda_topics.html                         ← LDA visualization (يُنشأ تلقائياً)
-├── coherence_scores.pkl                    ← LDA coherence scores (يُنشأ تلقائياً)
-├── *.pkl                                   ← Saved ML models (يُنشأ تلقائياً)
+│   └── fasttext_100.kv                     ← Word2Vec vectors (auto-generated)
+├── lda_final_model/                        ← Final LDA model (auto-generated)
+├── lda_topics.html                         ← LDA visualization (auto-generated)
+├── coherence_scores.pkl                    ← LDA coherence scores (auto-generated)
+├── *.pkl                                   ← Saved ML models (auto-generated)
 ├── *.model / *.state / *.npy              ← LDA model files (ignored by Git)
 ├── app.py                                  ← Flask app (if applicable)
 ├── static/ / templates/ / flask/           ← Web app files
@@ -40,14 +38,14 @@ NLP_NewsCategory-main/
 
 
 
-## ⚙️ Requirements / المتطلبات
+## ⚙️ Requirements
 
 - Python 3.8+
 - Java 8 (JDK) — *only if using Mallet (currently disabled)*
 - 8GB+ RAM (16GB recommended for DistilBERT)
 - GPU recommended for DistilBERT training
 
-### Python Libraries / المكتبات
+### Python Libraries 
 ```bash
 pip install numpy pandas matplotlib seaborn scikit-learn
 pip install gensim==3.8.3
@@ -62,11 +60,10 @@ python -m spacy download en_core_web_md
 
 ---
 
-## 🚀 Setup & Running / الإعداد والتشغيل
+## 🚀 Setup & Running  
 
-### 1. Extract Dataset / فك ضغط البيانات
+### 1. Extract Dataset
 Extract `Dataset.zip` into the `Dataset/` folder so the path becomes:
-فك ضغط `Dataset.zip` داخل مجلد `Dataset/` بحيث يصبح المسار:
 
 ```
 Dataset/News_Category_Dataset_v3.json
@@ -74,9 +71,8 @@ Dataset/News_Category_Dataset_v3.json
 
 ---
 
-### 2. Update Project Path / تحديث مسار المشروع
+### 2. Update Project Path 
 In the first code cell, update this line to match your local machine:
-في أول خلية كود، عدّل هذا السطر حسب جهازك:
 
 ```python
 path_to_folder = r"C:\Users\YOUR_NAME\...\NLP_NewsCategory-main"
@@ -85,7 +81,7 @@ os.chdir(path_to_folder)
 
 ---
 
-### 3. Run Order / تسلسل التشغيل
+### 3. Run Order 
 
 | Step | Description | Cells to Run |
 |------|-------------|--------------|
@@ -99,13 +95,12 @@ os.chdir(path_to_folder)
 
 ---
 
-## ⚠️ One-Time Execution Cells / خلايا تُشغل مرة واحدة فقط
+## ⚠️ One-Time Execution Cells 
 
 These cells are **commented out** in the notebook. Uncomment them, run **once**, then comment them back. They create model files that are auto-loaded on subsequent runs.
 
-هذه الخلايا **مُعلّقة** في المفكرة. أزل التعليق عنها، شغّلها **مرة واحدة**، ثم أعد تعليقها. تقوم بإنشاء ملفات الموديلات التي تُحمّل تلقائياً في المرات القادمة.
 
-| Cell / الخلية | Generates / تُنشئ | File / الملف |
+|   Cell      |     Generates    |   File   |
 |--------------|-------------------|--------------|
 | SpaCy Preprocessing | Cleaned corpus | `Dataset/Final_NewsCorpus_Clean.json` |
 | FastText Training | Word vectors | `W2V/fasttext_100.kv` |
@@ -120,13 +115,12 @@ These cells are **commented out** in the notebook. Uncomment them, run **once**,
 | DistilBERT Training | Transformer model | `C:/Models/my_model/` |
 
 > **Logic:** The code checks `if os.path.exists(path)` — if the file exists, it loads it; otherwise, it trains and saves it.  
-> **المنطق:** الكود يتحقق `if os.path.exists(path)` — إذا الملف موجود يُحمّله، وإلا يُدربه ويحفظه.
 
 ---
 
-## 📊 Results Summary / ملخص النتائج
+## 📊 Results Summary 
 
-| Model / النموذج | Representation / التمثيل | Accuracy / الدقة |
+| Model  | Representation  | Accuracy  |
 |----------------|------------------------|-----------------|
 | SVM (RBF) | TFIDF (10% data) | 75.85% |
 | Random Forest | TFIDF | 66.16% |
@@ -143,20 +137,18 @@ These cells are **commented out** in the notebook. Uncomment them, run **once**,
 
 ---
 
-## 🔧 Important Notes / ملاحظات مهمة
+## 🔧 Important Notes 
 
-1. **Dataset Size / حجم البيانات:**  
+1. **Dataset Size :**  
    The original dataset contains **209,527** articles with **42 categories**. We simplified it to **4 classes**: OTHER (0), POLITICS (1), WELLNESS (2), ENTERTAINMENT (3).
 
-2. **SVM Training Limitation / محدودية تدريب SVM:**  
+2. **SVM Training Limitation SVM:**  
    SVM with RBF kernel has quadratic complexity. Training on the full dataset (>200K samples) is computationally impractical. Therefore, a **10% subset** is used for training while the full test set is used for evaluation.  
-   SVM بنواة RBF له تعقيد تربيعي. التدريب على البيانات الكاملة (>200 ألف عينة) غير عملي. لذا يُستخدم **10% فقط** للتدريب مع الاختبار على كامل البيانات.
 
 3. **DistilBERT / المحول:**  
    - Training takes ~16 hours on CPU. Use GPU for faster training.  
    - The model is saved to `C:/Models/my_model/` by default. Change the path in the code if needed.  
-   - التدريب يستغرق ~16 ساعة على CPU. استخدم GPU للتسريع.  
-   - النموذج يُحفظ في `C:/Models/my_model/` افتراضياً. غيّر المسار في الكود إذا لزم الأمر.
+
 
 4. **LDA Topic Modeling / نماذج LDA:**  
    - Number of topics searched: [15, 20, 30, 35, 40, 45, 50, 60, 70]  
@@ -170,7 +162,7 @@ These cells are **commented out** in the notebook. Uncomment them, run **once**,
 
 ---
 
-## 📝 Citation / الاقتباس
+## 📝 Citation  
 
 Dataset: [News Category Dataset](https://www.kaggle.com/datasets/rmisra/news-category-dataset) — HuffPost, 2012-2022
 
